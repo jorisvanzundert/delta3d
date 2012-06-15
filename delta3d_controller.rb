@@ -18,12 +18,11 @@ class Delta3DController
     content_type 'application/json'
     json_string = params['json'];
     json_string = params['json'][:tempfile].read if params['json'][:tempfile]
-    json = JSON.parse(json_string, {:max_nesting => 4} )
-    "That is bullshit"
+    # instantiate delta3d, pass json_string, respond svg result
   end
   
   error do
     "Something didn't went quite as expected - error: #{request.env['sinatra.error'].to_s}"
   end
-  
+   
 end
