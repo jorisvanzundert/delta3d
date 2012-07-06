@@ -3,15 +3,15 @@ delta3d
 
 ### INSTALLING
 
-Download to a directory
-Create a secret (this is to hand out tokens to clients for retrieve the generated svgs): ruby secert.rb
-Fire up delta3d_controller.rb ($>ruby delta3d_controller.rb)
+- Download to a directory
+- Create a secret (this is to hand out tokens to clients for retrieve the generated svgs): ruby secert.rb
+- Fire up delta3d_controller.rb ($>ruby delta3d_controller.rb)
 
 ### DEPENDECIES
 
-Ruby 1.8.7+ (http://www.ruby-lang.org) 
-Ruby gems: sinatra, json/pure
-gnuplot (http://www.gnuplot.info/)
+- Ruby 1.8.7+ (http://www.ruby-lang.org) 
+- Ruby gems: sinatra, json/pure
+- gnuplot (http://www.gnuplot.info/)
 
 ### LICENSE
 
