@@ -1,0 +1,21 @@
+<body>
+    <div class="doc_sub1header">Web service mode</div>
+    <div class="doc_body">Send a POST request to this service at /delta3d_svg, the request body of which should contain a JSON string, formatted as follows:"</div>
+    <div class="code">
+        { "lines": <br />
+        &nbsp;&nbsp;{ "id":LINENUMBER,<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;"positions": [<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ "id":POSITION,<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"token": { "surface":WORDFORM, "lemmas":[ LEMMA1, LEMMA2, … ] }<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;… ]<br />
+        &nbsp;&nbsp;},<br />
+        &nbsp;&nbsp;&nbsp;… ]<br />
+        }
+    </div>
+    <div class="doc_body">The service will return you a Delta plot in svg.</div>
+    <div class="doc_body">JSON strings like this for full texts can get quite bulky. Therefor the following shorthand is allowed:</div>
+    <div class="code">{ "l":[ {"id":LINENUMBER, "p":[ {"id":POSITION, "t":{ "s":WORDFORM, "l":[ LEMMA1, LEMMA2, … ] } }, … ] }, … ] }</div>
+    <div class="doc_sub1header">Interactive mode</div>
+    <div class="doc_body">Not implemented yet</div>
+</body>

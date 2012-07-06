@@ -11,7 +11,11 @@ rdoc
 spec/reports
 test/tmp
 test/version_tmp
-tmp
+tmp/*
+dependencies
+resources
+secret.json
+*.log
 
 # YARD artifacts
 .yardoc

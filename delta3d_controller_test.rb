@@ -23,15 +23,15 @@ class Delta3DControllerTest < Test::Unit::TestCase
     assert last_response.body.include? "error: expected ',' or ']'"
   end
 
-  def test_valid_json
-    too_deep_json_string = '{ "line": { "position": { "token": { "todeep": [ "lemma1", "lemma2", "lemma3" ] } } } }'
+  def test_nesting
+    too_deep_json_string = '{ "line": { "position": { "token": { "one": { "two": { "three": { "four": { "todeep": [ "lemma1", "lemma2", "lemma3" ] } } } } } } } }'
     post '/delta3d_svg', 'json' => too_deep_json_string
-    assert last_response.body.include? "nesting of 5 is too deep"
+    assert last_response.body.include? "nesting of 9 is too deep"
   end
   
   def test_upload_json
-    post '/delta3d_svg', 'json' => Rack::Test::UploadedFile.new('fixtures/full_hash_excerpt.json', 'application/json')
-    #TODO assert that an svg comes back I guess
+    post '/delta3d_svg', 'json' => Rack::Test::UploadedFile.new('fixtures/full_hash_converted.json', 'application/json')
+    assert 4, last_response.body.scan(/DOCTYPE svg/).size
   end
 
 end

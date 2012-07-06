@@ -1,0 +1,154 @@
+h1 {
+    font-size: 18pt;
+    font-family: Calibri, Verdana, Microsoft Sans Serif;
+    position: relative;
+    top: 7px;
+}
+body {
+    background-color: #A3A3C2;
+    background-image: none; /*url('/logo_delta3d_2.png');*/
+    background-repeat: no-repeat;
+    background-position: 64px 16px;
+    font-family: Calibri, Verdana, Microsoft Sans Serif;
+    font-size: 10pt;
+    color: #00001F;
+}
+#logo_huygens_ing {
+    left: 10px;
+    position: absolute;
+    top: 10px;
+    width: 200px;
+    z-index: -6;
+}
+#logo_delta3d {
+    left: 115px;
+    position: absolute;
+    top: 80px;
+    width: 100px;
+    z-index: -4;
+}
+#logo_delta3d_footer {
+    width: 60px;
+    margin: 10px;
+    float: left;
+}
+#beta_sticker {
+    position: relative;
+    top: -130px;
+    left: 580px;
+}
+.clear { 
+    clear: both;    
+}.doc_sub1header {
+  font-family:"Times New Roman", Times, serif;
+  font-size: 11pt;
+  font-weight: bold; 
+}
+.doc_body {
+  font-family:"Times New Roman", Times, serif;
+  font-size: 10pt;
+  font-weight: normal;
+  margin-bottom: 10.2pt; 
+}
+.code {
+    font-family:"Courier";
+    font-size: 10pt;
+    font-weight: normal;
+    margin-bottom: 10.2pt; 
+}
+#container {
+    border: none;
+}
+#form_container {
+    width: 190px;
+    height: 320px;
+    border: 1px solid #666699;
+    background-color: #F0F0F5;    
+    float: left;
+    position: relative;
+    top: 167px;
+    padding: 5pt;
+}
+#svgs {
+    height: 500px;
+}
+#svg_main {
+    width: 500px;
+    height: 500px;
+    border: 1px solid #666699;
+    background-color: #F9F9FB;    
+    float: left;
+    margin-left: 18px;
+}
+#supporting_svgs {
+    width: 300px;
+    height: 500px;
+    float: left;    
+}
+.svg_supp {
+    width: 250px;
+    height: 157px;
+    border: 1px solid #666699;
+    background-color: #F0F0F5;    
+    margin-left: 18px;
+    margin-bottom: 12px;
+}
+.error {
+    background-color: #FF6666;
+    border: 1px solid #660000;
+    font-weight: bold;
+    font-size: 12pt;
+    color: #FFE6E6;
+    margin: 10pt;
+    padding: 10pt;
+}
+input {
+    margin-top: 1pt;
+    margin-bottom: 5pt;
+}
+#pickfiles img, #uploadfiles img {
+    float: left;
+}
+#filelist, #uploadfiles_label {
+    margin-top: 9pt;
+    margin-left: 8pt;
+    float: left;
+    color: #00001F;
+}
+#uploadfiles_label {
+    margin-top: 6pt;
+}
+#pickfiles {
+    float: left;
+    margin-bottom: 10pt;
+}
+#uploadfiles {
+    float: left;
+    margin-top: 12pt;
+}
+.uploadfile {
+    font-weight: bold;
+}
+#parameters {
+    margin-top: 4pt;
+}
+.spectrum_input {
+    width: 40px;
+    float: left;
+    margin-right: 8px;
+}
+.bias_input {
+    width: 67px;
+    float: left;
+    margin-right: 8px;
+}
+#download_plotdata_container {
+    visibility: hidden;
+    float: left;
+    color: #00001F;
+    position: relative;
+    left: 150px;
+    top: -86px;
+}
+
+

@@ -1,0 +1,242 @@
+<div id="header">
+</div>
+<div id="main">
+    <img id="logo_huygens_ing" src="/logo_huygens_ing.gif" />
+    <img id="logo_delta3d" src="/logo_delta3d_2.png" />
+    <div id="form_container">
+        <div id="container">
+            <a id="pickfiles" href="javascript:;" title="pick a file">
+                <img src="/folder.png"></img> 
+                <div id="filelist">Choose a source file…</div>
+            </a>
+            <div class="clear"></div>
+        </div>
+        <form id="parameters">
+            <label for="window_size">Window size…</label></br>
+            <input type="text" name="delta_parameters[window_size]" id="window_size" value="1000"></input>
+            <br/><label for="spectrum_size">Spectrum size, shift, number…</label></br>
+            <input type="text" class="spectrum_input" name="delta_parameters[spectrum_size]" id="spectrum_size" value="50"></input>
+            <input type="text" class="spectrum_input" name="delta_parameters[spectrum_shift]" id="spectrum_shift" value="10"></input>
+            <input type="text" class="spectrum_input" name="delta_parameters[shifts]" id="shifts" value="10"></input>
+            <br/><label for="bias">Bias…</label></br>
+            <input type="text" class="bias_input" name="delta_parameters[bias_start]" id="bias_start" value=""></input>
+            <input type="text" class="bias_input" name="delta_parameters[bias_end]" id="bias_end" value=""></input>
+            <br/><label for="sample">Sample frequency…</label></br>
+            <input type="text" name="delta_parameters[sample]" id="sample" value="100"></input>
+        </form>
+        <a id="uploadfiles" href="javascript:;" title="upload file">
+            <img src="/internet.png"></img>
+            <div id="uploadfiles_label">Upload and process…</div>
+        </a>
+    </div>
+    <div id="svgs">
+        <div id="main_svg">
+            <div id="svg_main"></div>
+        </div>
+        <div id="supporting_svgs">    
+            <div id="svg_supp1" onclick="swap('svg_supp1');" class="svg_supp"></div>
+            <div id="svg_supp2" onclick="swap('svg_supp2');" class="svg_supp"></div>
+            <div id="svg_supp3" onclick="swap('svg_supp3');" class="svg_supp"></div>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+<img id="logo_delta3d_footer" src="/logo_delta3d_2.png" />
+<h1>Delta3d Window Walker</h1>
+<img id="beta_sticker" src="/beta.png" />
+<div id="download_plotdata_container">
+    <a id="download_plotdata" href="javascript:;" title="Download plot data…">
+        <img src="/download_16.png"></img>
+    </a>
+</div>
+<div class="clear"></div>
+
+<a href="https://github.com/jorisvanzundert/delta3d"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+
+<script type="text/javascript">
+// Custom example logic
+function $upl(id) {
+	return document.getElementById(id);	
+}
+
+var uploader = new plupload.Uploader({
+    runtimes : 'html4',
+    browse_button : 'pickfiles',
+    container: 'container',
+    max_file_size : '10mb',
+    url : 'process',
+    resize : {width : 320, height : 240, quality : 90},
+    filters : [
+        {title : "Text files", extensions : "json,txt"},
+    ]
+});
+
+uploader.bind('BeforeUpload', function(up, file) {
+    var parameter_values = {};
+    $.each($('form').serializeArray(), function(i, field) {
+        parameter_values[field.name] = field.value;
+    });    
+    up.settings.multipart_params = parameter_values;
+});
+   
+uploader.bind('Init', function(up, params) {
+    // $upl('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
+});
+
+uploader.bind('FilesAdded', function(up, files) {
+    //Needed because Pluploader needs some time to add the file to the queue.
+    setTimeout( function(){ limitFiles(up, files) }, 50 );
+});
+
+function limitFiles( up, files ) {
+    most_recent = files.slice(-1)[0];
+    file_ids = $.map(up.files, function (item) { return item.id; });
+    $.each(file_ids, function(index, file_id) {
+        if( file_id!=most_recent.id ) { uploader.removeFile( uploader.getFile(file_id) ) };
+    });
+    $('#filelist').empty().html( '<div class="uploadfile" id="' + most_recent.id + '">' + most_recent.name.substring(0,17) + '&nbsp;<b></b></div>' );
+}
+
+uploader.bind('UploadProgress', function(up, file) {
+    $upl(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+});
+
+uploader.bind('FileUploaded', function(up, file, ret) {
+               token = ret.response;
+               console.log( 'received token: ' + token );
+               pollerTimeoutId = setTimeout( pollTimeOut, 120000 );
+               pollerIntervalId = setInterval( poll, 3000 );
+               $('#svg_main,.svg_supp').css( { 
+                   backgroundImage: 'url(\'/loader.gif\')',
+                   backgroundPosition: 'center',
+                   backgroundRepeat: 'no-repeat' } );
+});
+            
+$upl('uploadfiles').onclick = function() {
+    clear();
+    uploader.start();
+    return false;
+};
+
+uploader.init();
+
+$('#download_plotdata').click( function() {
+    uriContent = "data:application/octet-stream," + encodeURIComponent( $('#download_plotdata').data( 'plot_data') );
+    newWindow = window.open( uriContent, 'neuesDokument' );
+    return false;
+});
+
+function setWarningSign() {
+    $('#svg_main,.svg_supp').css( { 
+        backgroundImage: 'none'
+    });
+    $('#svg_main').css( { 
+        backgroundImage: 'url(\'/warning.png\')',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+    });    
+}
+
+function pollTimeOut() {
+    clearInterval(pollerIntervalId);
+    setWarningSign();
+    console.log( 'Failed to retrieve SVG' );
+}
+
+function poll() { 
+     $.ajax({ 
+         type: "POST",
+         dataType: "html",
+         url: "/svg_available",
+         data: { token: token },
+         success: function( data ){        
+            if( data=='true' ) {
+                clearTimeout( pollerTimeoutId );
+                clearInterval( pollerIntervalId );
+                console.log( 'success, stopped polling' );
+                getSVG( token );
+            };
+            if( data!='true' && data!='false' ) {
+                clearTimeout( pollerTimeoutId );
+                clearInterval( pollerIntervalId );
+                console.log( 'failure, stopped polling' );
+                setWarningSign();
+                $('#svg_main').html( '<div class="error">' + data + '</div>' );
+            };
+            $.each(uploader.files, function(index, file) {
+                uploader.removeFile( file );
+            });
+            $('#filelist').empty().html('Choose a source file…');
+         }
+     });
+}
+
+function getSVG( token ) {
+     $.ajax({ 
+         type: "POST",
+         dataType: "html",
+         url: "/svg",
+         data: { token: token },
+         success: function( svgData ){
+             svgs = svgData.split( '<?' );
+             $('#svg_main').data( 'svg_string', '<?' + svgs[1] );
+             $('#svg_main').svg({
+                 loadURL: $('#svg_main').data( 'svg_string' )
+             });
+             $('#svg_supp1').data( 'svg_string', '<?' + svgs[2] );
+             $('#svg_supp1').svg({
+                 loadURL: $('#svg_supp1').data( 'svg_string' )
+             });
+             $('#svg_supp2').data( 'svg_string', '<?' + svgs[3] );
+             $('#svg_supp2').svg({
+                 loadURL: $('#svg_supp2').data( 'svg_string' )
+             });
+             $('#svg_supp3').data( 'svg_string', '<?' + svgs[4] );
+             $('#svg_supp3').svg({
+                 loadURL: $('#svg_supp3').data( 'svg_string' )
+             });
+             $('#download_plotdata').data( 'plot_data', '<pre>\r\n' + svgs[5].split( '<pre>' )[1] );
+             $('#download_plotdata').css( "visibility", "visible" );    
+             $('#svg_main,.svg_supp').css( { 
+                 backgroundImage: 'none'
+             });
+         }
+     });
+}
+
+function clear() {
+    $('#svg_main').svg( 'destroy' );
+    $('#svg_supp1').svg( 'destroy' );
+    $('#svg_supp2').svg( 'destroy' );
+    $('#svg_supp3').svg( 'destroy' );
+    $('#svg_main,.svg_supp').css( { 
+        backgroundImage: 'none'
+    });
+    $('#svg_main').empty();
+    $('#download_plotdata').css( "visibility", "hidden" );    
+}
+
+function swap( svg_supp_id ) {
+    svg_supp_string = $('#'+svg_supp_id).data( 'svg_string' );
+    svg_main_string = $('#svg_main').data( 'svg_string' );
+    $('#'+svg_supp_id).data( 'svg_string', svg_main_string);
+    $('#svg_main').data( 'svg_string', svg_supp_string);
+    $('#svg_main').svg('destroy');
+    $('#svg_main').svg({
+        loadURL: $('#svg_main').data( 'svg_string' )
+    });
+    $('#'+svg_supp_id).svg('destroy');
+    $('#'+svg_supp_id).svg({
+        loadURL: $('#'+svg_supp_id).data( 'svg_string' )
+    });
+}
+
+//Todos
+// * Allow for first position != 1 (only problem in Bias?)
+//    => this seems not to be a problem but should be documented as 'Mke sure you count 1,2,3 (even if your lines start 4050.4051 etc. actual line numbers will not result in a bias.)
+//    => line numbers are defaulted to 0 (so if first line is 405, 406, 407, this will turn into 1,2,3 in the plot)
+// * Words/locations show up on hover in graph
+// * Documentation
+// * Github release
+
+</script>
