@@ -13,6 +13,9 @@ body {
     font-size: 10pt;
     color: #00001F;
 }
+body.doc {
+    background-color: #FFFFFF;    
+}
 #logo_huygens_ing {
     left: 10px;
     position: absolute;
@@ -39,7 +42,13 @@ body {
 }
 .clear { 
     clear: both;    
-}.doc_sub1header {
+}
+.doc_header {
+    font-family:"Times New Roman", Times, serif;
+    font-size: 14pt;
+    font-weight: bold; 
+}
+.doc_sub1header {
   font-family:"Times New Roman", Times, serif;
   font-size: 11pt;
   font-weight: bold; 
@@ -49,6 +58,13 @@ body {
   font-size: 10pt;
   font-weight: normal;
   margin-bottom: 10.2pt; 
+}
+.doc_body_ref {
+  font-family:"Times New Roman", Times, serif;
+  font-size: 10pt;
+  font-weight: normal;
+  margin-bottom: 10.2pt; 
+  padding-left: 10pt;
 }
 .code {
     font-family:"Courier";

@@ -21,3 +21,5 @@ secret.json
 .yardoc
 _yardoc
 doc/
+fixtures/LISA*
+

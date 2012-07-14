@@ -1,6 +1,13 @@
-<body>
-    <div class="doc_sub1header">Web service mode</div>
-    <div class="doc_body">Send a POST request to this service at /delta3d_svg, the request body of which should contain a JSON string, formatted as follows:"</div>
+<body class="doc">
+    <div class="doc_header">About this microservice</div>
+    <div class="doc_body">This service will take in your tokens and will run a 'Delta analysis' on it. Delta is a measure for stylistic difference between texts based on high frequency word use. The basic principles of the approach are layed down and explained in:</div>
+    <div class="doc_body_ref">Burrows, J. (2002) '"Delta": a Measure of Stylistic Difference and a Guide to Likely Authorship.' <i>Literary and Linguistic Computing</i> 17, 267-87.</div>
+    <div class="doc_body">But many will appreciate the further explaination, examples, and testing in:</div>
+    <div class="doc_body_ref">Hoover, D.L. (2004) 'Testing Burrows's Delta.' <i>Literary and Linguistic Computing</i> 19, 453-475.</div>
+    <div class="doc_body">The specific flavor of Burrows' Delta that Delta3D gives you turns Delta into a measure of text internal stylistic consistency (as to high frequency word use). Whereas the original Burrows' Delta procedure assumes you will have a large set of texts from which one can compute an average word use in a certain period, genre, or group of authors, this flavor uses the text itself as that average 'background'. This is particularly useful to identifying and tracing stylistic anomalies in single texts, that should show as high or low peaks in any graph (data) produced.</div> 
+    <div class="doc_body">Delta3D divides a given text in many windows of text, each window being of the same size (i.e. same number of consecutive words in the text). Each window starts a few tokens further into the text. For each window the Delta 'distance' to the text's average high frequency word use is computed and plotted. If the point of this escapes you, you will at least end up with nice and intrigueing graphs that represent the stylistic variation within the text you sent to this service.</div>
+    <div class="doc_header">Interacting with this service: web service mode</div>
+    <div class="doc_body">Send a POST request to this service at /process, the request body of which should contain a JSON string, formatted as follows:"</div>
     <div class="code">
         { "lines": <br />
         &nbsp;&nbsp;{ "id":LINENUMBER,<br />
@@ -13,9 +20,30 @@
         &nbsp;&nbsp;&nbsp;… ]<br />
         }
     </div>
-    <div class="doc_body">The service will return you a Delta plot in svg.</div>
     <div class="doc_body">JSON strings like this for full texts can get quite bulky. Therefor the following shorthand is allowed:</div>
     <div class="code">{ "l":[ {"id":LINENUMBER, "p":[ {"id":POSITION, "t":{ "s":WORDFORM, "l":[ LEMMA1, LEMMA2, … ] } }, … ] }, … ] }</div>
-    <div class="doc_sub1header">Interactive mode</div>
-    <div class="doc_body">Not implemented yet</div>
+    <div class="doc_body">You can discard also with the line numbers and lemmas if you want to. The shortest form therefor is:</div>
+    <div class="code">{ "p":[ {"id":POSITION, "t":{ "s":WORDFORM } }, … ] }</div>
+    <div class="doc_body">A number of measurement parameters can be send along as form field values. See 'interactive mode' for parameter options.</div>
+    <div class="doc_sub1header">Entering polling mode</div>
+    <div class="doc_body">The service will take in your JSON string (and measurement parameters). It will immediately return you a 'token'. It then moves on to analyzing your text. It may be occupied with that for some considerable time. For an average text (some 75,000 words) this could take up to 20 seconds on a low end server. This is why you will have to 'poll' the service whether results have become available already. Computation may fail or time out, which is why 'just waiting' for a http result is a very sub-optimal strategy for your client side needs. You 'poll' the service by posting to /svg_available the token you received on uploading your text to /process. The response to posting this token can have the following values:
+        <ul>
+            <li>false: calculation in progress, but no results yet</li>
+            <li>true: calculation finished, plot available at /svg</il>
+            <li>'a string': calculation failed, process halted, description of exception thrown while calculating</li>
+        </ul>
+Once you receive a 'true' you can retrieve the SVGs of plot charts by POSTing your token to /svg. The response will have four SVGs representing various views of the same 3d plot (i.e. an 3d angled viewed, a side view, bird's eye view, and front view). It will also have the raw plot data attached to the end of the response. Splitting and presenting the various SVGs and other information is left as an exercise to the reader. (Hint: take a look at the getSVG( token ) function in the source of /index.)</div>
+    <div class="doc_sub1header">Time out</div>
+    <div class="doc_body">This is a RESTfull service. This means it has no state or session management. In the case of failed computatiotn, structural invalid JSON for this service, too long computation, etc. etc. this service will after two minutes time out with an error message and will remove any uploaded data and –if any– results from the server.</div>
+    <div class="doc_header">GUI Interactive mode</div>
+    <div class="doc_body">Pretty much just a nice graphic wrapper around what has been described above. Pick a file, upload, wait for results.. There's a number of parameters that can be set for the Delta calculation:
+        <ul>
+            <li><b>Window size<br/> (form post parameter: delta_parameters[window_size]=<i>n</i>)</b><br/> Size of the window (fragment of text) for which Delta is computed. This defaults to a 1000 lines. It is not advised to put this number anywhere under 500, as statistics will be pretty much meaningless under 500 lines. In the case of not using lines, all windows take 5 times window_size tokens as their ingest (so 5000 tokens by default).<br/><br/></li>
+            <li><b>Spectrum size<br/> (form post parameter: delta_parameters[spectrum_size]=<i>n</i>)</b><br/> Number of words in the subset of high frequency words that is used for Delta calculation. Defaults to 50, which means that the first graph plots a computation of Delta for each window in the text based on the 1 to 50 highest word frequencies. The second graph computes Delta in each window for the 10 to 60 highest word frequencies. Etc., depending also on…<br/><br/></li>
+            <li><b>Spectrum shift<br/> (form post parameter: delta_parameters[spectrum_shift]=<i>n</i>)</b><br/> The number of items (high frequency words) that the spectrum window skips down the full high frequency vocabulary list with every new cylce of calculating Delta for each window in the text. Defaults to 10, cf. Spectrum size.<br/><br/></li>
+            <li><b>Shift number<br/> (form post parameter: delta_parameters[shifts]=<i>n</i>)</b><br/> The number of subsets of high frequency words in the vocabulary for which a graph will be calculated and plotted.<br/><br/></li>
+            <li><b>Bias<br/> (form post parameters: delta_parameters[bias_start]=<i>n</i>&delta_parameters[bias_end]=<i>n</i>)</b><br/> The starting and ending line number of the bias if a bias is to be used. A bias is an arbitrary part of the text that is compared to all windows rather than the complete 'background' or 'stylistic average' of the text. Usefull for 'amplifying' stylistics anomalies. But be carefull: biases are tricky and skew any graph indeed very much towards that specific fragment. That is: it will look like anything else of the text is stylistically very remote from the bias part. Which in essence maybe true, but is exaggerated very much through the bias.<br/><br/></li>
+            <li><b>Sample frequency<br/> (form post parameter: delta_parameters[sample]=<i>n</i>)</b><br/> The granularity of the chart produced. Defaults to a very reasonable 100, which means: every 100th calculation of a Delta for a window is used for plotting; typically this results in granular enough plots and charts. Remark: setting this to a lower value implies a performance penalty.<br/><br/></li>
+        </ul>
+    </div>
 </body>
