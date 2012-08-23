@@ -4,13 +4,14 @@ delta3d
 ### INSTALLING
 
 - Download to a directory
-- Create a secret (this is to hand out tokens to clients for retrieve the generated svgs): ruby secert.rb
+- Create a secret (this is to hand out tokens to clients for retrieve the generated svgs): ruby secret.rb
 - Fire up delta3d_controller.rb ($>ruby delta3d_controller.rb)
+- Visit yourdomain.org:4567 (port 4567 is default for Sinatra, adjust according to Sinatra docs)
 
 ### DEPENDECIES
 
 - Ruby 1.8.7+ (http://www.ruby-lang.org) 
-- Ruby gems: sinatra, json/pure
+- Ruby gems: sinatra, sinatra-contrib, json/pure
 - gnuplot (http://www.gnuplot.info/)
 
 ### LICENSE

@@ -22,8 +22,10 @@ class Delta3DController
     erb :doc
   end
   
-  get '/index' do
-    erb :index
+  ['/index', '/'].each do |pattern|
+    get pattern do
+      erb :index
+    end
   end
   
   post '/process' do
