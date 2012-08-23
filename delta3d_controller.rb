@@ -12,6 +12,9 @@ set :environment, :development
 disable :raise_errors
 disable :show_exceptions
 
+path = File.expand_path(File.dirname(__FILE__))
+Dir.mkdir( "#{path}/tmp" ) if !File.exist?( "#{path}/tmp" )
+
 class Delta3DController
   
   get '/status' do
