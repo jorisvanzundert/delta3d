@@ -33,9 +33,11 @@ class Delta3DController
   
   post '/process' do
     content_type 'text/html'
-    params['delta_parameters']
-    json_string = params['file'];
-    json_string = params['file'][:tempfile].read if params['file'][:tempfile]
+    json_string = params['file']
+    if params['file'][:tempfile]
+      json_string = params['file'][:tempfile].read 
+      json_string = JSON.generate( { "txt" => json_string } ) if params['file'][:filename].end_with?( '.txt' )
+    end
     parameters = params.reject { |key,value| key.eql?('file') }
     tmp_suffix = Time.now.strftime("%Y%m%d%H%M%S")
     thread = Thread.new(params['delta_parameters']) do |parameters|
@@ -54,10 +56,10 @@ class Delta3DController
         svgs_tmp_file.write( svgs )
         svgs_tmp_file.close 
       rescue Exception => e
-        # puts e.inspect
-        # puts e.backtrace
+        puts e.inspect
+        puts e.backtrace
         list_exception( thread_id, e )
-        exit
+        # exit
       end
     end
     token = encrypt_token( "#{thread.object_id}_#{tmp_suffix}" )
@@ -89,7 +91,6 @@ class Delta3DController
   end
 
   error do
-    puts "ouch ie ouch"
     "Something didn't went quite as expected - error: #{request.env['sinatra.error'].message}"
   end
   

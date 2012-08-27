@@ -26,10 +26,18 @@ class Delta3D
     
     raise InvalidJSONStructureException, "JSON input does not have the right structure" if source.size != 1
     first_key = source.keys.first 
-    raise InvalidJSONStructureException, "JSON input does not have the right structure" if !["l", "p", "lines", "positions"].include? first_key
+    raise InvalidJSONStructureException, "JSON input does not have the right structure" if !["txt", "l", "p", "lines", "positions"].include? first_key
     self.send( first_key, source[ first_key ] )
   end
-    
+   
+  def txt( txt_source )
+    position_id = 0
+    positions_source = txt_source.split.map do |surface|
+      { "id" => "#{position_id+=1}" , "t" => { "s" => surface } }
+    end
+    positions( positions_source )
+  end
+   
   def positions( positions_source )
     tokens = positions_source.collect { |position| Token.new( position ) }
     tokens = tokens.sort{ |token_a, token_b| token_a.position <=> token_b.position }
@@ -84,6 +92,7 @@ class Delta3D
     options = { :window_size => 1000, :spectrum_size => 50, :spectrum_shift => 10, :shifts => 10, :sample => 100}.merge(options)
     step = Time.now
     plot_data = []
+    guard_size( lines_ordered )
     background = BackgroundFactory.create( lines_ordered, lines_ordered.size / 1000 )
     bias = Bias.new( background, lines_ordered, options[:bias_start], options[:bias_end] )
     walking_window = Window.new( lines_ordered, options[:window_size] )
@@ -128,10 +137,8 @@ class Delta3D
     end
     plot_data_file.write( plot_data_string )
     plot_data_file.close
-    plot_data_string = %{<?xml version="1.0" encoding="utf-8"  standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<pre>} << plot_data_string << "</pre>\n"
-    gn = %{set xlabel "verse" font "Times New Roman Bold, 11" offset 0,-1
+    plot_data_string = %{<?xml version="1.0" encoding="utf-8"  standalone="no"?>\n<pre>} << plot_data_string << "</pre>\n"
+    gn = %{set xlabel "line" font "Times New Roman Bold, 11" offset 0,-1
 set ylabel "top f segment" font "Times New Roman Bold, 11" offset -0.5,-1
 set zlabel "Delta" font "Times New Roman Bold, 11" offset 5,0
 set terminal svg font "Times New Roman, 8"
@@ -159,6 +166,10 @@ splot "#{data_file}" using 1:2:3:ytic(4) with lines ls 1
     svgs << plot_data_string
   end
 
+  def guard_size( lines_ordered )
+    raise StandardError, "The length of the uploaded text is too short for analysis." if lines_ordered.size < 2000
+  end
+  
 end
 
 

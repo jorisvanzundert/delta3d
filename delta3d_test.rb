@@ -21,6 +21,7 @@ class Delta3DTest < Test::Unit::TestCase
      assert_raise( ArgumentError ) do
        delta3d = Delta3D.new( JSON.generate( text_hash ) )
      end
+     
    end
    
    def test_too_many_outer_keys
@@ -30,6 +31,14 @@ class Delta3DTest < Test::Unit::TestCase
      end
    end
    
+   def test_nesting
+     too_deep_json_string = '{ "line": { "position": { "token": { "one": { "two": { "three": { "four": { "todeep": [ "lemma1", "lemma2", "lemma3" ] } } } } } } } }'
+     exception = assert_raise( JSON::NestingError ) do 
+       delta3d = Delta3D.new( too_deep_json_string )
+     end
+     assert_equal "nesting of 9 is too deep", exception.message
+   end
+  
    def test_lines_ordering
      #  "lines" => [ { id => "1", "positions" => [ { id => "100", token => { "surface" => "aword", "lemmas" => [ "lemma1", "lemma2" ] } } ] } ] }
      lines_arr = Array.new
@@ -297,7 +306,7 @@ class Delta3DTest < Test::Unit::TestCase
     total_tokens = delta3d.lines_ordered.inject(0){ |total_tokens, line| total_tokens += line.tokens.size }
     assert_equal positions.size, total_tokens
   end
-
+  
   def test_lemmaless
     positions = mock_lines_source.reduce([]){ |positions, mock_line| positions + mock_line["positions"] }
     lemmas_in = []
@@ -315,5 +324,14 @@ class Delta3DTest < Test::Unit::TestCase
     total_tokens = delta3d.lines_ordered.inject(0){ |total_tokens, line| total_tokens += line.tokens.size }
     assert_equal positions.size, total_tokens
     delta3d.lines_ordered.each{ |line| line.tokens.each{ |token| assert lemmas_in.include? token.lemmas[0] } }
-  end    
+  end
+
+  def test_too_short
+    delta3d = Delta3D.new( JSON.generate( { "txt" => File.read('fixtures/too_short.txt') } ) )
+    exception = assert_raise( StandardError ) do
+      delta3d.calculate
+    end
+    assert_equal "The length of the uploaded text is too short for analysis.", exception.message
+  end
+
 end
