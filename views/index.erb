@@ -1,12 +1,12 @@
 <div id="header">
 </div>
 <div id="main">
-    <img id="logo_huygens_ing" src="/logo_huygens_ing.gif" />
-    <img id="logo_delta3d" src="/logo_delta3d_2.png" />
+    <img id="logo_huygens_ing" src="logo_huygens_ing.gif" />
+    <img id="logo_delta3d" src="logo_delta3d_2.png" />
     <div id="form_container">
         <div id="container">
             <a id="pickfiles" href="javascript:;" title="pick a file">
-                <img src="/folder.png"></img> 
+                <img src="folder.png"></img> 
                 <div id="filelist">Choose a source file…</div>
             </a>
             <div class="clear"></div>
@@ -41,12 +41,12 @@
     </div>
     <div class="clear"></div>
 </div>
-<img id="logo_delta3d_footer" src="/logo_delta3d_2.png" />
+<img id="logo_delta3d_footer" src="logo_delta3d_2.png" />
 <h1>Delta3d Window Walker</h1>
-<img id="beta_sticker" src="/beta.png" />
+<img id="beta_sticker" src="beta.png" />
 <div id="download_plotdata_container">
     <a id="download_plotdata" href="javascript:;" title="Download plot data…">
-        <img src="/download_16.png"></img>
+        <img src="download_16.png"></img>
     </a>
 </div>
 <div class="clear"></div>
@@ -107,7 +107,7 @@ uploader.bind('FileUploaded', function(up, file, ret) {
                pollerTimeoutId = setTimeout( pollTimeOut, 120000 );
                pollerIntervalId = setInterval( poll, 3000 );
                $('#svg_main,.svg_supp').css( { 
-                   backgroundImage: 'url(\'/loader.gif\')',
+                   backgroundImage: 'url(\'loader.gif\')',
                    backgroundPosition: 'center',
                    backgroundRepeat: 'no-repeat' } );
 });
@@ -131,7 +131,7 @@ function setWarningSign() {
         backgroundImage: 'none'
     });
     $('#svg_main').css( { 
-        backgroundImage: 'url(\'/warning.png\')',
+        backgroundImage: 'url(\'warning.png\')',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
     });    
@@ -147,7 +147,7 @@ function poll() {
      $.ajax({ 
          type: "POST",
          dataType: "html",
-         url: "/svg_available",
+         url: "svg_available",
          data: { token: token },
          success: function( data ){        
             if( data=='true' ) {
@@ -175,7 +175,7 @@ function getSVG( token ) {
      $.ajax({ 
          type: "POST",
          dataType: "html",
-         url: "/svg",
+         url: "svg",
          data: { token: token },
          success: function( svgData ){
              svgs = svgData.split( '<?' );
@@ -235,8 +235,7 @@ function swap( svg_supp_id ) {
 // * Allow for first position != 1 (only problem in Bias?)
 //    => this seems not to be a problem but should be documented as 'Mke sure you count 1,2,3 (even if your lines start 4050.4051 etc. actual line numbers will not result in a bias.)
 //    => line numbers are defaulted to 0 (so if first line is 405, 406, 407, this will turn into 1,2,3 in the plot)
-// * Documentation -> /doc and in GUI
-// * Testrun with tokens only Lisa's adem
+// * Documentation in GUI
 // * Words/locations show up on hover in graph
 
 </script>
