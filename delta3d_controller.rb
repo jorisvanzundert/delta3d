@@ -1,21 +1,25 @@
 require 'rubygems'
-require 'sinatra'
+require 'sinatra/base'
 require 'json/pure'
 require 'delta3d'
 require 'base64'
 require 'openssl'
 require 'uri'
-require "sinatra/reloader" if development?
-
-set :environment, :development
-
-disable :raise_errors
-disable :show_exceptions
+require "sinatra/reloader"
 
 path = File.expand_path(File.dirname(__FILE__))
 Dir.mkdir( "#{path}/tmp" ) if !File.exist?( "#{path}/tmp" )
 
-class Delta3DController
+class Delta3DController < Sinatra::Base
+
+  set :environment, :development
+
+  disable :raise_errors
+  disable :show_exceptions
+
+  configure :development do
+    register Sinatra::Reloader
+  end
   
   get '/status' do
     body Thread.main["thread_exceptions"].inspect
@@ -165,5 +169,7 @@ class Delta3DController
     end
     
   end
+
+  run! if app_file == $0
 
 end
