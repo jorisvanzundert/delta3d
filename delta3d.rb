@@ -5,8 +5,7 @@ require 'logger'
 class Delta3D
 
   def initialize( json_string )
-    File.open( "delta3d.log", "a" )
-    @logger = Logger.new('delta3d.log', 10, 1024000)
+    @logger = Logger.new(STDOUT)
     
     @token_size = 0
     @max_position = 0
